@@ -2,6 +2,9 @@
 
 from .mongodb_client import MongoDBClient, get_db_client, get_database
 from .models import (
+    # Pydantic models
+    Task,
+    ExecutionPlan,
     # Collection names
     USERS_COLLECTION,
     CREDENTIALS_COLLECTION,
@@ -31,6 +34,9 @@ from .models import (
 )
 
 __all__ = [
+    # Pydantic models
+    "Task",
+    "ExecutionPlan",
     # Client
     "MongoDBClient",
     "get_db_client",

@@ -1,6 +1,7 @@
 """
 Database models and operations for Vienna AI Agent Orchestration System.
 Defines collection schemas and provides CRUD operations.
+Also includes Pydantic models for task execution.
 """
 
 import logging
@@ -9,11 +10,112 @@ from datetime import datetime
 from uuid import uuid4
 
 from pymongo.errors import DuplicateKeyError, PyMongoError
+from pydantic import BaseModel, Field
 
 from .mongodb_client import get_database
 
 
 logger = logging.getLogger(__name__)
+
+
+# ============================================================================
+# Pydantic Models for Task Execution
+# ============================================================================
+
+class Task(BaseModel):
+    """
+    Represents a single task to be executed by an agent.
+    """
+    id: str = Field(default_factory=lambda: str(uuid4()))
+    agent_type: str = Field(..., description="Type of agent (gmail, github)")
+    mode: str = Field(..., description="Agent mode (read, send, list_repos, etc.)")
+    parameters: Dict[str, Any] = Field(default_factory=dict, description="Mode parameters")
+    dependencies: List[str] = Field(default_factory=list, description="List of task IDs this task depends on")
+    required_inputs: Dict[str, str] = Field(default_factory=dict, description="Required inputs from other tasks")
+    status: str = Field(default="pending", description="Task status: pending, running, completed, failed")
+    result: Optional[Dict[str, Any]] = Field(default=None, description="Task execution result")
+    error: Optional[str] = Field(default=None, description="Error message if task failed")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": "task_123",
+                "agent_type": "gmail",
+                "mode": "read",
+                "parameters": {"max_results": 10},
+                "dependencies": [],
+                "required_inputs": {},
+                "status": "pending",
+                "result": None,
+                "error": None
+            }
+        }
+
+
+class ExecutionPlan(BaseModel):
+    """
+    Represents a plan for executing multiple tasks.
+    """
+    tasks: List[Task] = Field(..., description="List of tasks to execute")
+    execution_type: str = Field(..., description="Execution type: parallel or sequential")
+    task_graph: Dict[str, List[str]] = Field(
+        default_factory=dict,
+        description="Dependency graph: task_id -> list of dependent task IDs"
+    )
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "tasks": [
+                    {
+                        "id": "task_1",
+                        "agent_type": "gmail",
+                        "mode": "read",
+                        "parameters": {"max_results": 5},
+                        "dependencies": [],
+                        "status": "pending"
+                    },
+                    {
+                        "id": "task_2",
+                        "agent_type": "github",
+                        "mode": "list_repos",
+                        "parameters": {"limit": 10},
+                        "dependencies": [],
+                        "status": "pending"
+                    }
+                ],
+                "execution_type": "parallel",
+                "task_graph": {}
+            }
+        }
+    
+    def get_execution_order(self) -> List[List[str]]:
+        """
+        Get the order in which tasks should be executed based on dependencies.
+        
+        Returns:
+            List of task ID lists, where each inner list can be executed in parallel
+        """
+        # Build dependency map
+        dependencies = {task.id: set(task.dependencies) for task in self.tasks}
+        completed = set()
+        execution_order = []
+        
+        while len(completed) < len(self.tasks):
+            # Find tasks with no pending dependencies
+            ready_tasks = [
+                task.id for task in self.tasks
+                if task.id not in completed and dependencies[task.id].issubset(completed)
+            ]
+            
+            if not ready_tasks:
+                # Circular dependency detected
+                raise ValueError("Circular dependency detected in task graph")
+            
+            execution_order.append(ready_tasks)
+            completed.update(ready_tasks)
+        
+        return execution_order
 
 
 # Collection names
