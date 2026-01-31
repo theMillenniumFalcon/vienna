@@ -30,13 +30,12 @@ from src.cli.terminal import (
     clear_screen
 )
 
-# Configure logging
+# Configure logging (file only, no console output for better UX)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('vienna.log'),
-        logging.StreamHandler()
+        logging.FileHandler('vienna.log')
     ]
 )
 
