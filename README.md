@@ -442,12 +442,7 @@ vienna/
 ├── Dockerfile                       # Docker configuration
 ├── docker-compose.yml              # Docker Compose setup
 ├── pyproject.toml                  # Python dependencies
-├── .env.example                    # Environment template
-│
-└── docs/                           # Documentation
-    ├── MONGODB_SETUP.md            # MongoDB configuration
-    ├── OAUTH_SETUP.md              # OAuth setup guide
-    └── DOCKER.md                   # Docker deployment guide
+└── .env.example                    # Environment template
 ```
 
 ---
@@ -500,13 +495,6 @@ Vienna includes production-ready Docker configuration with:
 - **Resource limits**: CPU and memory constraints
 - **Volume mounts**: Persistent logs
 - **Security**: Non-root user, minimal attack surface
-
-See [DOCKER.md](DOCKER.md) for comprehensive deployment guide including:
-- Production best practices
-- Kubernetes deployment
-- Load balancing
-- Monitoring and logging
-- Security hardening
 
 ---
 
