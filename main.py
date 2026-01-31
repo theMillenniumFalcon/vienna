@@ -142,7 +142,7 @@ def main():
                     continue
                 
                 # Process natural language command
-                console.print("[dim]🤔 Analyzing your request...[/dim]")
+                console.print("[dim]Analyzing your request...[/dim]")
                 
                 # Parse intent
                 try:

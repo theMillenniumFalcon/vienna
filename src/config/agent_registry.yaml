@@ -1,0 +1,48 @@
+agents:
+  gmail:
+    name: GmailAgent
+    type: email
+    description: Manage Gmail emails
+    modes:
+      read:
+        description: Retrieve emails from Gmail
+        parameters:
+          - query (optional)
+          - max_results (optional, default: 10)
+          - date_filter (optional: today, this_week, custom)
+      send:
+        description: Send email via Gmail
+        parameters:
+          - to (required)
+          - subject (required)
+          - body (required)
+          - cc (optional)
+      search:
+        description: Search emails with filters
+        parameters:
+          - query (required)
+          - max_results (optional)
+    oauth_required: true
+    scopes:
+      - https://www.googleapis.com/auth/gmail.readonly
+      - https://www.googleapis.com/auth/gmail.send
+
+  github:
+    name: GitHubAgent
+    type: version_control
+    description: Interact with GitHub repositories
+    modes:
+      list_repos:
+        description: List user repositories
+        parameters:
+          - sort_by (optional: stars, updated, created)
+          - limit (optional, default: 10)
+          - visibility (optional: all, public, private)
+      get_repo:
+        description: Get detailed repository information
+        parameters:
+          - repo_name (required)
+    oauth_required: true
+    scopes:
+      - repo
+      - read:user

@@ -291,7 +291,7 @@ def display_error(error_message: str, helpful_hint: Optional[str] = None) -> Non
     console.print(f"\n[red]✗ Error:[/red] {error_message}")
     
     if helpful_hint:
-        console.print(f"[dim]💡 {helpful_hint}[/dim]")
+        console.print(f"[dim]{helpful_hint}[/dim]")
     
     console.print()
 
