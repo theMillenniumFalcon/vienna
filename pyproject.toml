@@ -16,4 +16,5 @@ dependencies = [
     "pygithub>=2.8.1",
     "pymongo>=4.16.0",
     "pyyaml>=6.0.3",
+    "rich>=14.3.1",
 ]
